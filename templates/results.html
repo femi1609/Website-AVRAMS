@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Prediction Results Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/pandas-js/dist/pandas.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Adjust alignment to start from the top */
+            height: auto; /* Allow body height to adjust based on content */
+            min-height: 100vh; /* Maintain at least full viewport height */
+        }
+
+        .container {
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            width: 100%; /* Take full width */
+            overflow-y: auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        h2 {
+            text-align: center;
+            color: #555;
+            margin-top: 30px;
+        }
+
+        table {
+            width: 100%; /* Ensure table takes full width */
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+
+        a {
+            display: inline-block;
+            margin-top: 20px;
+            color: #007bff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        /* Styles for chart containers */
+        .chart-container {
+            width: 100%;
+            max-width: 800px; /* Max width for charts */
+            margin: 20px auto; /* Center charts */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Prediction Results</h1>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>CVE ID</th>
+                    <th>Vendor Name</th>
+                    <th>CWE</th>
+                    <th>Composite Risk Score</th>
+                    <th>Predicted EPSS Score</th>
+                    <th>Rank</th>
+                    <th>Risk Level</th>
+                    <th>Suggested Action</th>
+                    <th>Timeline</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for result in results %}
+                <tr>
+                    <td>{{ result['CVE ID'] }}</td>
+                    <td>{{ result['Vendor Name'] }}</td>
+                    <td>{{ result['CWE'] }}</td>
+                    <td>{{ result['Composite Risk Score'] }}</td>
+                    <td>{{ result['Predicted EPSS Score'] }}</td>
+                    <td>{{ result['Rank'] }}</td>
+                    <td>{{ result['Risk Level'] }}</td>
+                    <td>{{ result['Suggested Action'] }}</td>
+                    <td>{{ result['Timeline'] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <h2>Risk Score Chart</h2>
+        <div class="chart-container">
+            <canvas id="riskScoreChart"></canvas>
+        </div>
+        
+        <h2>Predicted EPSS Score Chart</h2>
+        <div class="chart-container">
+            <canvas id="epScoreChart"></canvas>
+        </div>
+
+        <h2>Risk Level Distribution</h2>
+        <div class="chart-container">
+            <div id="riskLevelDistribution"></div>
+        </div>
+
+        <h2>Top Vendors by Predicted EPSS Score</h2>
+        <div class="chart-container">
+            <div id="topVendorsEPSS"></div>
+        </div>
+
+        <h2>Suggested Actions Breakdown</h2>
+        <div class="chart-container">
+            <div id="suggestedActionsBreakdown"></div>
+        </div>
+
+        <h2>Risk Level by Vendor</h2>
+        <div class="chart-container">
+            <div id="riskLevelByVendor"></div>
+        </div>
+
+        <a href="/">Back to Home</a>
+    </div>
+
+    <script>
+        const results = {{ results | tojson }}; // Convert results to JSON for JavaScript
+
+// Sort the results based on Composite Risk Score in descending order
+results.sort((a, b) => b['Composite Risk Score'] - a['Composite Risk Score']);
+
+// Prepare data for existing charts after sorting
+const cveIds = results.map(result => result['CVE ID']);
+const riskScores = results.map(result => result['Composite Risk Score']);
+const epScores = results.map(result => result['Predicted EPSS Score']);
+
+// Existing Risk Score Chart
+const ctxRiskScore = document.getElementById('riskScoreChart').getContext('2d');
+const riskScoreChart = new Chart(ctxRiskScore, {
+    type: 'bar',
+    data: {
+        labels: cveIds,
+        datasets: [{
+            label: 'Composite Risk Score',
+            data: riskScores,
+            backgroundColor: 'rgba(75, 192, 192, 0.6)',
+            borderColor: 'rgba(75, 192, 192, 1)',
+            borderWidth: 1
+        }]
+    },
+    options: {
+        scales: {
+            y: {
+                beginAtZero: true,
+                title: {
+                    display: true,
+                    text: 'Risk Score'
+                }
+            },
+            x: {
+                title: {
+                    display: true,
+                    text: 'CVE ID'
+                }
+            }
+        }
+    }
+});
+
+
+        // Existing EP Score Chart
+        const ctxEpScore = document.getElementById('epScoreChart').getContext('2d');
+        const epScoreChart = new Chart(ctxEpScore, {
+            type: 'line',
+            data: {
+                labels: cveIds,
+                datasets: [{
+                    label: 'Predicted EPSS Score',
+                    data: epScores,
+                    fill: false,
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    tension: 0.1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'EPSS Score'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'CVE ID'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Risk Level Distribution Chart
+        const riskLevels = results.map(result => result['Risk Level']);
+        const riskLevelCounts = {};
+        riskLevels.forEach(level => {
+            riskLevelCounts[level] = (riskLevelCounts[level] || 0) + 1;
+        });
+        const riskLevelLabels = Object.keys(riskLevelCounts);
+        const riskLevelValues = Object.values(riskLevelCounts);
+        const riskLevelTrace = {
+            x: riskLevelLabels,
+            y: riskLevelValues,
+            type: 'bar'
+        };
+        const riskLevelLayout = {
+            xaxis: { title: 'Risk Level' },
+            yaxis: { title: 'Number of Vulnerabilities' }
+        };
+        Plotly.newPlot('riskLevelDistribution', [riskLevelTrace], riskLevelLayout);
+
+        // Top Vendors by Predicted EPSS Score Chart
+const vendors = results.map(result => result['Vendor Name']);
+const vendorEPSSMap = {};
+
+// Create a map of vendors and their highest predicted EPSS scores
+vendors.forEach((vendor, index) => {
+    vendorEPSSMap[vendor] = Math.max(vendorEPSSMap[vendor] || 0, epScores[index]);
+});
+
+// Sort the vendors based on their EPSS scores in descending order
+const sortedVendors = Object.entries(vendorEPSSMap).sort((a, b) => b[1] - a[1]);
+
+// Extract the sorted vendor names and corresponding EPSS scores
+const topVendorLabels = sortedVendors.map(item => item[0]);
+const topVendorValues = sortedVendors.map(item => item[1]);
+
+// Prepare the chart trace
+const topVendorTrace = {
+    x: topVendorLabels,
+    y: topVendorValues,
+    type: 'bar'
+};
+
+// Define the chart layout
+const topVendorLayout = {
+    xaxis: { title: 'Vendor Name' },
+    yaxis: { title: 'Predicted EPSS Score' },
+    tickangle: -45,
+};
+
+// Plot the chart using Plotly
+Plotly.newPlot('topVendorsEPSS', [topVendorTrace], topVendorLayout);
+
+
+        // Suggested Actions Breakdown Pie Chart
+        const suggestedActions = results.map(result => result['Suggested Action']);
+        const suggestedActionCounts = {};
+        suggestedActions.forEach(action => {
+            suggestedActionCounts[action] = (suggestedActionCounts[action] || 0) + 1;
+        });
+        const actionLabels = Object.keys(suggestedActionCounts);
+        const actionValues = Object.values(suggestedActionCounts);
+        const suggestedActionTrace = {
+            values: actionValues,
+            labels: actionLabels,
+            type: 'pie',
+            hole: 0.4
+        };
+        const suggestedActionLayout = {
+            };
+        Plotly.newPlot('suggestedActionsBreakdown', [suggestedActionTrace], suggestedActionLayout);
+
+        
+
+// Risk Level by Vendor Chart
+const vendorRiskMap = {};
+results.forEach(result => {
+    const vendor = result['Vendor Name'];
+    const riskLevel = result['Risk Level'];
+    vendorRiskMap[vendor] = vendorRiskMap[vendor] || {};
+    vendorRiskMap[vendor][riskLevel] = (vendorRiskMap[vendor][riskLevel] || 0) + 1;
+});
+
+const vendorRiskLevels = Object.keys(vendorRiskMap);
+const vendorRiskData = vendorRiskLevels.map(vendor => ({
+    vendor,
+    levels: Object.keys(vendorRiskMap[vendor]),
+    counts: Object.values(vendorRiskMap[vendor])
+}));
+
+// Prepare the data for plotting
+const riskLevelData = [];
+vendorRiskData.forEach(data => {
+    data.levels.forEach((level, index) => {
+        riskLevelData.push({
+            x: level, // Risk Level
+            y: data.vendor, // Vendor Name
+            count: data.counts[index] // Number of vulnerabilities
+        });
+    });
+});
+
+// Create traces for the plot
+const riskLevelTraces = riskLevelData.map(data => ({
+    x: [data.x], // Risk Level
+    y: [data.y], // Vendor Name
+    text: [data.count], // Number of vulnerabilities as hover text
+    type: 'bar',
+    name: data.y // Name for the legend
+}));
+
+const riskLevelVendorLayout = {
+    xaxis: { title: 'Risk Level' },
+    yaxis: { title: 'Vendor Name' },
+    tickangle: -45,
+    barmode: 'stack' // You can use 'group' or 'overlay' if preferred
+};
+
+// Plotting the data
+Plotly.newPlot('riskLevelByVendor', riskLevelTraces, riskLevelVendorLayout);
+
+</script>
+</body>
+</html>
