@@ -15,6 +15,8 @@ with open('scaler.pkl', 'rb') as f:
 with open('random_forest_model.pkl', 'rb') as f:
     model_top = pickle.load(f)
 
+st.write(f"Model type: {type(model_top)}")
+
 # Define feature mapping and top features
 top_features = ['Vendor Name Encoded', 'CVE ID Encoded', 'CWE Encoded', 'Composite Risk Score']
 
@@ -163,6 +165,18 @@ if input_method == "Manual Input":
 
                 # Prepare features for prediction
                 X_new = df[top_features].values
+                # Check for missing values in the DataFrame
+                if df[top_features].isnull().any().any():
+                    st.error("Error: There are missing values in the input features. Please clean the data before prediction.")
+                else:
+                    # Check shape of the features
+                    st.write(f"Shape of input features for prediction: {X_new.shape}")
+
+                    # Predict EPSS score using the model
+                    try:
+                        df['Predicted EPSS Score'] = model_top.predict(X_new)
+                    except Exception as e:
+                        st.error(f"Prediction failed: {str(e)}")
 
                 # Predict EPSS score using the model
                 df['Predicted EPSS Score'] = model_top.predict(X_new)
@@ -223,6 +237,12 @@ elif input_method == "CSV Upload":
 
         # Prepare features for prediction
         X_new = df[top_features].values
+
+        from sklearn.impute import SimpleImputer
+
+        # Create an imputer to fill missing values
+        imputer = SimpleImputer(strategy='mean')  # Choose a suitable strategy
+        X_new = imputer.fit_transform(X_new)
 
         # Predict EPSS score using the model
         df['Predicted EPSS Score'] = model_top.predict(X_new)
