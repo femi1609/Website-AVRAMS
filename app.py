@@ -270,11 +270,3 @@ elif input_method == "CSV Upload":
 
         st.write("### Results")
         st.dataframe(df)
-        def show_results():
-            with open("results.html", "r") as f:
-                html_content = f.read()
-            st.components.v1.html(html_content, height=800)  # Adjust height as necessary
-        
-            # Add a button or some condition to show the results
-            if st.button("Show Results"):
-                show_results()
