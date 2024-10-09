@@ -254,11 +254,11 @@ elif input_method == "CSV Upload":
 
         # Risk assessment based on EPSS score
         def risk_assessment(likelihood):
-            if likelihood >= 0.9:
+            if likelihood >= 0.35:
                 return 'Critical', 'Immediate Patching', '24 hours'
-            elif 0.7 <= likelihood < 0.9:
+            elif 0.25 <= likelihood < 0.35:
                 return 'High', 'Priority Patching', '48 hours'
-            elif 0.4 <= likelihood < 0.7:
+            elif 0.15 <= likelihood < 0.25:
                 return 'Medium', 'Scheduled Patching', '7 days'
             else:
                 return 'Low', 'Monitor', '30 days'
