@@ -273,41 +273,41 @@ elif input_method == "CSV Upload":
         st.write("### Results")
         st.dataframe(df)
         
-st.title('Prediction Results Dashboard')
-
-# Show the dataframe
-st.write(df)
-
-# Risk Score Chart
-st.subheader('Risk Score Chart')
-fig_risk_score = px.bar(df, x='CVE ID', y='Composite Risk Score', labels={'Composite Risk Score': 'Risk Score'})
-st.plotly_chart(fig_risk_score)
-
-# Predicted EPSS Score Chart
-st.subheader('Predicted EPSS Score Chart')
-fig_ep_score = px.line(df, x='CVE ID', y='Predicted EPSS Score', labels={'Predicted EPSS Score': 'EPSS Score'})
-st.plotly_chart(fig_ep_score)
-
-# Risk Level Distribution
-st.subheader('Risk Level Distribution')
-risk_level_counts = df['Risk Level'].value_counts()
-fig_risk_level = px.bar(x=risk_level_counts.index, y=risk_level_counts.values, labels={'x': 'Risk Level', 'y': 'Count'})
-st.plotly_chart(fig_risk_level)
-
-# Top Vendors by Predicted EPSS Score
-st.subheader('Top Vendors by Predicted EPSS Score')
-top_vendors = df.groupby('Vendor Name')['Predicted EPSS Score'].max().sort_values(ascending=False).reset_index()
-fig_top_vendors = px.bar(top_vendors, x='Vendor Name', y='Predicted EPSS Score')
-st.plotly_chart(fig_top_vendors)
-
-# Suggested Actions Breakdown
-st.subheader('Suggested Actions Breakdown')
-action_counts = df['Suggested Action'].value_counts()
-fig_actions = go.Figure(data=[go.Pie(labels=action_counts.index, values=action_counts.values, hole=0.4)])
-st.plotly_chart(fig_actions)
-
-# Risk Level by Vendor
-st.subheader('Risk Level by Vendor')
-risk_level_by_vendor = df.groupby(['Vendor Name', 'Risk Level']).size().unstack(fill_value=0)
-fig_risk_level_vendor = px.bar(risk_level_by_vendor, x=risk_level_by_vendor.index, y=risk_level_by_vendor.columns)
-st.plotly_chart(fig_risk_level_vendor)
+        st.title('Prediction Results Dashboard')
+        
+        # Show the dataframe
+        st.write(df)
+        
+        # Risk Score Chart
+        st.subheader('Risk Score Chart')
+        fig_risk_score = px.bar(df, x='CVE ID', y='Composite Risk Score', labels={'Composite Risk Score': 'Risk Score'})
+        st.plotly_chart(fig_risk_score)
+        
+        # Predicted EPSS Score Chart
+        st.subheader('Predicted EPSS Score Chart')
+        fig_ep_score = px.line(df, x='CVE ID', y='Predicted EPSS Score', labels={'Predicted EPSS Score': 'EPSS Score'})
+        st.plotly_chart(fig_ep_score)
+        
+        # Risk Level Distribution
+        st.subheader('Risk Level Distribution')
+        risk_level_counts = df['Risk Level'].value_counts()
+        fig_risk_level = px.bar(x=risk_level_counts.index, y=risk_level_counts.values, labels={'x': 'Risk Level', 'y': 'Count'})
+        st.plotly_chart(fig_risk_level)
+        
+        # Top Vendors by Predicted EPSS Score
+        st.subheader('Top Vendors by Predicted EPSS Score')
+        top_vendors = df.groupby('Vendor Name')['Predicted EPSS Score'].max().sort_values(ascending=False).reset_index()
+        fig_top_vendors = px.bar(top_vendors, x='Vendor Name', y='Predicted EPSS Score')
+        st.plotly_chart(fig_top_vendors)
+        
+        # Suggested Actions Breakdown
+        st.subheader('Suggested Actions Breakdown')
+        action_counts = df['Suggested Action'].value_counts()
+        fig_actions = go.Figure(data=[go.Pie(labels=action_counts.index, values=action_counts.values, hole=0.4)])
+        st.plotly_chart(fig_actions)
+        
+        # Risk Level by Vendor
+        st.subheader('Risk Level by Vendor')
+        risk_level_by_vendor = df.groupby(['Vendor Name', 'Risk Level']).size().unstack(fill_value=0)
+        fig_risk_level_vendor = px.bar(risk_level_by_vendor, x=risk_level_by_vendor.index, y=risk_level_by_vendor.columns)
+        st.plotly_chart(fig_risk_level_vendor)
