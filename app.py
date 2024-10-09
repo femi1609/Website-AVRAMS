@@ -324,4 +324,32 @@ elif input_method == "CSV Upload":
         
         # Display the line plot in Streamlit
         st.plotly_chart(fig_line_plot)
+
+        def convert_timeline_to_hours(timeline):
+            if 'hour' in timeline:
+                return int(timeline.split()[0])
+            elif 'day' in timeline:
+                return int(timeline.split()[0]) * 24
+            return 0
+
+        df['Timeline (Hours)'] = df['Timeline'].apply(convert_timeline_to_hours)
+        
+        # Streamlit line plot using Timeline (in hours) vs Composite Risk Score
+        st.subheader('Composite Risk Score Over Resolution Timeline')
+        
+        fig_line_plot = px.line(df, x='Timeline (Hours)', y='Composite Risk Score',
+                                labels={'Timeline (Hours)': 'Timeline (Hours)', 'Composite Risk Score': 'Risk Score'},
+                                title='Composite Risk Score by Resolution Timeline')
+        
+        # Display the line plot in Streamlit
+        st.plotly_chart(fig_line_plot)
+        
+        # Optionally, you can create a line plot for Predicted EPSS Score over Timeline (Hours)
+        st.subheader('Predicted EPSS Score Over Resolution Timeline')
+        
+        fig_line_plot_epss = px.line(df, x='Timeline (Hours)', y='Predicted EPSS Score',
+                                     labels={'Timeline (Hours)': 'Timeline (Hours)', 'Predicted EPSS Score': 'EPSS Score'},
+                                     title='Predicted EPSS Score by Resolution Timeline')
+        
+        st.plotly_chart(fig_line_plot_epss)
         
