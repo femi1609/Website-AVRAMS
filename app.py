@@ -316,20 +316,17 @@ elif input_method == "CSV Upload":
         fig_risk_level_vendor = px.bar(risk_level_by_vendor, x=risk_level_by_vendor.index, y=risk_level_by_vendor.columns)
         st.plotly_chart(fig_risk_level_vendor)
         
-        # Ensure 'Publish Date' is in datetime format if it's a string
-        df['Publish Date'] = pd.to_datetime(df['Publish Date'])
         
-        # Sort the DataFrame by Publish Date
-        df_sorted_by_date = df.sort_values(by='Publish Date')
+        st.subheader('Risk Score Over Rank')
         
-        # Subheader for Time Series Plot
-        st.subheader('Composite Risk Score Over Time')
+        # Create a line plot of Composite Risk Score over Rank
+        fig_line_plot = px.line(df, x='Rank', y='Composite Risk Score', labels={'Composite Risk Score': 'Risk Score', 'Rank': 'Rank'})
         
-        # Create the line chart using Publish Date vs Composite Risk Score
-        fig_time_series = px.line(df_sorted_by_date, x='Publish Date', y='Composite Risk Score', 
-                                  title='Time Series of Composite Risk Score', 
-                                  labels={'Publish Date': 'Date', 'Composite Risk Score': 'Risk Score'})
+        # Display the line plot in Streamlit
+        st.plotly_chart(fig_line_plot)
         
-        # Plot the line chart in Streamlit
-        st.plotly_chart(fig_time_series)
+        # Optionally, you can also create a line plot for Predicted EPSS Score over Rank
+        st.subheader('Predicted EPSS Score Over Rank')
         
+        fig_line_plot_epss = px.line(df, x='Rank', y='Predicted EPSS Score', labels={'Predicted EPSS Score': 'EPSS Score', 'Rank': 'Rank'})
+        st.plotly_chart(fig_line_plot_epss)
