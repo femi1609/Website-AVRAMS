@@ -325,8 +325,3 @@ elif input_method == "CSV Upload":
         # Display the line plot in Streamlit
         st.plotly_chart(fig_line_plot)
         
-        # Optionally, you can also create a line plot for Predicted EPSS Score over Rank
-        st.subheader('Predicted EPSS Score Over Rank')
-        
-        fig_line_plot_epss = px.line(df, x='Rank', y='Predicted EPSS Score', labels={'Predicted EPSS Score': 'EPSS Score', 'Rank': 'Rank'})
-        st.plotly_chart(fig_line_plot_epss)
