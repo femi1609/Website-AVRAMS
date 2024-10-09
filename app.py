@@ -275,14 +275,18 @@ elif input_method == "CSV Upload":
         
         st.title('Prediction Results Dashboard')
         
-        # Show the dataframe
-        st.write(df)
-        
         # Risk Score Chart
         st.subheader('Risk Score Chart')
-        fig_risk_score = px.bar(df, x='CVE ID', y='Composite Risk Score', labels={'Composite Risk Score': 'Risk Score'})
-        st.plotly_chart(fig_risk_score)
+
+        # Sort the DataFrame by Composite Risk Score in descending order
+        df_sorted = df.sort_values(by='Composite Risk Score', ascending=False)
         
+        # Create the bar chart with the sorted DataFrame
+        fig_risk_score = px.bar(df_sorted, x='CVE ID', y='Composite Risk Score', labels={'Composite Risk Score': 'Risk Score'})
+        
+        # Display the chart
+        st.plotly_chart(fig_risk_score)
+
         # Predicted EPSS Score Chart
         st.subheader('Predicted EPSS Score Chart')
         fig_ep_score = px.line(df, x='CVE ID', y='Predicted EPSS Score', labels={'Predicted EPSS Score': 'EPSS Score'})
