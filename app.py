@@ -315,3 +315,21 @@ elif input_method == "CSV Upload":
         risk_level_by_vendor = df.groupby(['Vendor Name', 'Risk Level']).size().unstack(fill_value=0)
         fig_risk_level_vendor = px.bar(risk_level_by_vendor, x=risk_level_by_vendor.index, y=risk_level_by_vendor.columns)
         st.plotly_chart(fig_risk_level_vendor)
+        
+        # Ensure 'Publish Date' is in datetime format if it's a string
+        df['Publish Date'] = pd.to_datetime(df['Publish Date'])
+        
+        # Sort the DataFrame by Publish Date
+        df_sorted_by_date = df.sort_values(by='Publish Date')
+        
+        # Subheader for Time Series Plot
+        st.subheader('Composite Risk Score Over Time')
+        
+        # Create the line chart using Publish Date vs Composite Risk Score
+        fig_time_series = px.line(df_sorted_by_date, x='Publish Date', y='Composite Risk Score', 
+                                  title='Time Series of Composite Risk Score', 
+                                  labels={'Publish Date': 'Date', 'Composite Risk Score': 'Risk Score'})
+        
+        # Plot the line chart in Streamlit
+        st.plotly_chart(fig_time_series)
+        
