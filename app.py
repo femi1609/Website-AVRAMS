@@ -338,8 +338,7 @@ elif input_method == "CSV Upload":
         st.subheader('Composite Risk Score Over Resolution Timeline')
         
         fig_line_plot = px.line(df, x='Timeline (Hours)', y='Composite Risk Score',
-                                labels={'Timeline (Hours)': 'Timeline (Hours)', 'Composite Risk Score': 'Risk Score'},
-                                title='Composite Risk Score by Resolution Timeline')
+                                labels={'Timeline (Hours)': 'Timeline (Hours)', 'Composite Risk Score': 'Risk Score'})
         
         # Display the line plot in Streamlit
         st.plotly_chart(fig_line_plot)
@@ -348,8 +347,7 @@ elif input_method == "CSV Upload":
         st.subheader('Predicted EPSS Score Over Resolution Timeline')
         
         fig_line_plot_epss = px.line(df, x='Timeline (Hours)', y='Predicted EPSS Score',
-                                     labels={'Timeline (Hours)': 'Timeline (Hours)', 'Predicted EPSS Score': 'EPSS Score'},
-                                     title='Predicted EPSS Score by Resolution Timeline')
+                                     labels={'Timeline (Hours)': 'Timeline (Hours)', 'Predicted EPSS Score': 'EPSS Score'})
         
         st.plotly_chart(fig_line_plot_epss)
         
